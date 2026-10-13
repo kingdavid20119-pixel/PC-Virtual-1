@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meu PC Virtual</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;font-family:Arial,sans-serif;color:white;
+ height:100vh;overflow:hidden;
+ background:linear-gradient(135deg,#073b8c,#1689d4,#6bc8ed);
+}
+.desktop{height:100vh;padding:15px;position:relative}
+.icons{display:grid;grid-template-columns:75px;gap:20px}
+.icon{
+ width:70px;text-align:center;padding:8px 3px;
+ border:1px solid transparent;border-radius:6px;
+ cursor:pointer;font-size:13px
+}
+.icon:active,.icon:hover{background:#ffffff35;border-color:#ffffff50}
+.emoji{font-size:34px;display:block;margin-bottom:5px}
+.taskbar{
+ position:absolute;bottom:0;left:0;width:100%;height:55px;
+ background:#18263be8;backdrop-filter:blur(15px);
+ display:flex;align-items:center;justify-content:space-around;
+ padding:5px;gap:8px
+}
+.taskbar button{
+ border:0;border-radius:8px;background:transparent;
+ color:white;font-size:22px;padding:7px 12px;cursor:pointer
+}
+.taskbar button:hover{background:#ffffff25}
+#clock{font-size:12px;text-align:center}
+.window{
+ position:absolute;left:5%;top:12%;width:90%;height:65%;
+ max-height:500px;background:#f4f6fa;color:#222;
+ border-radius:10px;overflow:hidden;
+ box-shadow:0 12px 35px #0006;display:none
+}
+.titlebar{
+ height:43px;background:#243a59;color:white;
+ display:flex;align-items:center;justify-content:space-between;
+ padding:0 12px;font-weight:bold
+}
+.close{
+ border:0;background:#e84c4c;color:white;
+ border-radius:5px;padding:6px 12px;font-size:16px
+}
+.content{padding:16px;overflow:auto;height:calc(100% - 43px)}
+.appbutton{
+ display:block;width:100%;padding:13px;margin:8px 0;
+ border:1px solid #ddd;border-radius:7px;
+ background:white;text-align:left;font-size:15px
+}
+#startmenu{
+ display:none;position:absolute;bottom:62px;left:10px;
+ width:min(320px,90%);padding:18px;border-radius:14px;
+ background:#192b43f5;box-shadow:0 8px 30px #0005
+}
+#startmenu input{
+ width:100%;padding:11px;border-radius:7px;border:0
+}
+.startitem{
+ padding:12px;margin-top:5px;border-radius:6px;cursor:pointer
+}
+.startitem:hover{background:#ffffff25}
+textarea{width:100%;height:180px;padding:10px;font:15px Arial}
+input,textarea{max-width:100%}
+@media(min-width:600px){
+ .window{left:20%;width:60%;top:10%}
+ .icons{grid-template-columns:80px}
+}
+</style>
+</head>
+<body>
+<div class="desktop">
+ <div class="icons">
+  <div class="icon" onclick="openApp('computer')">
+   <span class="emoji">🖥️</span>Este PC
+  </div>
+  <div class="icon" onclick="openApp('notes')">
+   <span class="emoji">📝</span>Bloco de notas
+  </div>
+  <div class="icon" onclick="openApp('browser')">
+   <span class="emoji">🌐</span>Navegador
+  </div>
+  <div class="icon" onclick="openApp('about')">
+   <span class="emoji">⚙️</span>Configurações
+  </div>
+ </div>
+
+ <div id="startmenu">
+  <h3>🪟 Meu Windows Virtual</h3>
+  <input id="search" placeholder="Pesquisar aplicativo..."
+   oninput="filterApps()">
+  <div id="startitems">
+   <div class="startitem" onclick="openApp('computer')">🖥️ Este PC</div>
+   <div class="startitem" onclick="openApp('notes')">📝 Bloco de notas</div>
+   <div class="startitem" onclick="openApp('browser')">🌐 Navegador</div>
+   <div class="startitem" onclick="openApp('about')">⚙️ Configurações</div>
+  </div>
+ </div>
+
+ <div class="window" id="computer">
+  <div class="titlebar"><span>🖥️ Este PC</span>
+   <button class="close" onclick="closeApp('computer')">✕</button>
+  </div>
+  <div class="content">
+   <h2>Meu computador</h2>
+   <p>Bem-vindo ao seu PC virtual demonstrativo!</p>
+   <button class="appbutton" onclick="openApp('notes')">📝 Abrir Bloco de notas</button>
+   <button class="appbutton" onclick="openApp('browser')">🌐 Abrir Navegador</button>
+   <p>Este PC é uma interface web. Não representa um disco rígido real.</p>
+  </div>
+ </div>
+
+ <div class="window" id="notes">
+  <div class="titlebar"><span>📝 Bloco de notas</span>
+   <button class="close" onclick="closeApp('notes')">✕</button>
+  </div>
+  <div class="content">
+   <h3>Bloco de notas</h3>
+   <textarea id="notepad" placeholder="Escreva aqui..."></textarea>
+   <button class="appbutton" onclick="saveNotes()">💾 Salvar notas neste navegador</button>
+   <p id="saved"></p>
+  </div>
+ </div>
+
+ <div class="window" id="browser">
+  <div class="titlebar"><span>🌐 Navegador</span>
+   <button class="close" onclick="closeApp('browser')">✕</button>
+  </div>
+  <div class="content">
+   <h3>Navegador web</h3>
+   <p>Pesquise na internet:</p>
+   <form onsubmit="searchWeb(event)">
+    <input id="webquery" placeholder="Digite sua pesquisa"
+     style="width:100%;padding:12px">
+    <button class="appbutton" type="submit">🔎 Pesquisar</button>
+   </form>
+   <p>Alguns sites bloqueiam a abertura dentro de janelas incorporadas.</p>
+  </div>
+ </div>
+
+ <div class="window" id="about">
+  <div class="titlebar"><span>⚙️ Configurações</span>
+   <button class="close" onclick="closeApp('about')">✕</button>
+  </div>
+  <div class="content">
+   <h2>Configurações</h2>
+   <p><b>Sistema:</b> Meu PC Virtual Web</p>
+   <p><b>Versão:</b> 1.0</p>
+   <p><b>Plataforma:</b> Navegador</p>
+   <p>Esta aplicação não é o sistema operacional Windows.</p>
+   <button class="appbutton" onclick="toggleTheme()">🎨 Alternar papel de parede</button>
+  </div>
+ </div>
+
+ <div class="taskbar">
+  <button onclick="toggleStart()" title="Iniciar">⊞</button>
+  <button onclick="openApp('computer')" title="Este PC">🖥️</button>
+  <button onclick="openApp('browser')" title="Navegador">🌐</button>
+  <button onclick="openApp('notes')" title="Notas">📝</button>
+  <div id="clock"></div>
+ </div>
+</div>
+<script>
+function openApp(id){
+ document.getElementById('startmenu').style.display='none';
+ document.getElementById(id).style.display='block';
+}
+function closeApp(id){
+ document.getElementById(id).style.display='none';
+}
+function toggleStart(){
+ const m=document.getElementById('startmenu');
+ m.style.display=m.style.display==='block'?'none':'block';
+}
+function filterApps(){
+ const q=document.getElementById('search').value.toLowerCase();
+ document.querySelectorAll('#startitems .startitem').forEach(item=>{
+  item.style.display=item.textContent.toLowerCase().includes(q)?'block':'none';
+ });
+}
+function saveNotes(){
+ try{
+  localStorage.setItem('virtualPCNotes',
+   document.getElementById('notepad').value);
+  document.getElementById('saved').textContent='Notas salvas neste navegador!';
+ }catch(e){
+  document.getElementById('saved').textContent='Não foi possível salvar.';
+ }
+}
+document.getElementById('notepad').value=
+ localStorage.getItem('virtualPCNotes')||'';
+function searchWeb(e){
+ e.preventDefault();
+ const q=document.getElementById('webquery').value.trim();
+ if(q)window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank');
+}
+let wallpaper=0;
+function toggleTheme(){
+ const colors=[
+  'linear-gradient(135deg,#073b8c,#1689d4,#6bc8ed)',
+  'linear-gradient(135deg,#311b92,#8e24aa,#e1bee7)',
+  'linear-gradient(135deg,#004d40,#26a69a,#b2dfdb)',
+  'linear-gradient(135deg,#263238,#546e7a,#b0bec5)'
+ ];
+ wallpaper=(wallpaper+1)%colors.length;
+ document.body.style.background=colors[wallpaper];
+}
+function updateClock(){
+ const now=new Date();
+ document.getElementById('clock').innerHTML=
+  now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+
+  '<br>'+now.toLocaleDateString('pt-BR');
+}
+updateClock();
+setInterval(updateClock,1000);
+</script>
+</body>
+</html>
